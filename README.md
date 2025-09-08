@@ -2,7 +2,7 @@
 
 [My Notes](notes.md)
 
-This startup will be a prototype of a secure message transfer website/app. So far, I have working code for sending all text messages, in the future we can incoorperate sending images and video. 
+This startup will be a prototype of a secure message transfer website/app. So far, I have working code for sending all text messages, in the future we can incoorperate sending images and video. This project will incoorperate a hybrid of RSA and One-Time_Pad encryption to produce a secure message sharing environment. This website will eventually be converted to a more realistic use model.  
 
 
 > [!NOTE]
@@ -43,19 +43,19 @@ sequenceDiagram
 
 ### Key features
 
-- Describe your key feature
-- Describe your key feature
-- Describe your key feature
+- One-Time-Pad encryption for each character of each message
+- New random One-Time_pad key for each sent message
+- RSA assymetric style One-Time-Pad key encryption and transmission
 
 ### Technologies
 
 I am going to use the required technologies in the following ways.
 
-- **HTML** - Description here
-- **CSS** - Description here
+- **HTML** - Used for the basic frame of the website
+- **CSS** - Used to make the website more visually appealing 
 - **React** - Description here
 - **Service** - Description here
-- **DB/Login** - Description here
+- **DB/Login** - Used to secure users private and public keys
 - **WebSocket** - Description here
 
 ## 🚀 AWS deliverable
