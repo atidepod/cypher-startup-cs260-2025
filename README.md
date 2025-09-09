@@ -30,12 +30,16 @@ Have you ever wanted to send a potentially risky text, but were afraid that your
 
 This website is a completly free End to End Encrypted messaging service. It will securelly transmit your messages via a system of encryption that utilises "private" and "public" keys. Upon registering, the website will automaticly generate a perfectly random "private" and "public" key pair and save this pair. 
 
-```mermaid
-sequenceDiagram
-    actor You
-    actor Website
-    You->>Website: Replace this with your design
-```
+### User Flow Chart
+1. Message Sender Logs In
+2. Cypher produces a random RSA "public" and "private" key pair
+3. "Private" key is storred on device, "public" key on Cypher database
+4. Sender inputs message
+5. Cypher produces a random One-Time-Pad style encryption of the Sender's message
+6. Cypher encrypts the One-Time-Pad key using RSA
+7. Cypher transmits the encrypted key and message to the Receiver
+8. Reciever's Cypher account will decrypt the message using their "private" key and the Sender's "public" key
+   
 
 ### Key features
 
