@@ -26,7 +26,7 @@ Have you ever wanted to send a potentially risky text, but were afraid that your
 
 ### Design
 
-![Design image](placeholder.png)
+![Design image](startup_drawing.jpg)
 
 This website is a completly free End to End Encrypted messaging service. It will securelly transmit your messages via a system of encryption that utilises "private" and "public" keys. Upon registering, the website will automaticly generate a perfectly random "private" and "public" key pair and save this pair. 
 
