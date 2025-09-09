@@ -19,13 +19,13 @@ For this deliverable I did the following. I checked the box `[x]` and added a de
 
 ### Elevator pitch
 
-Have you ever wanted to send a potentially risky text, but were afraid that your messaging service was insecure? worry no more! Get registered at Cypher.com to get peace of mind through secure messeging for free!
+Have you ever wanted to send a potentially risky text, but were afraid that your messaging service was insecure? Worry no more! Get registered at Cypher.com to get peace of mind through secure messeging for free!
 
 ### Design
 
 ![Design image](startup_drawing.jpg)
 
-This website is a completly free End to End Encrypted messaging service. It will securelly transmit your messages via a system of encryption that utilises "private" and "public" keys. Upon registering, the website will automaticly generate a perfectly random "private" and "public" key pair and save this pair. 
+This website is a completly free End to End Encrypted messaging service. It will securelly transmit your messages via a system of encryption that utilises "private" and "public" keys, and RSA encrypted One-Time-Pad decryption keys. Each message has a compeltely new randomly generated One-Time-Pad key, ensuring Cypher's integrety
 
 ### User Flow Chart
 1. Message Sender Logs In
