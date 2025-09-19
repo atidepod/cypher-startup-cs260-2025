@@ -1,32 +1,198 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Cypher Messages</title>
-
+  <title>Cypher Demo</title>
 </head>
-<body>
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h2>Messages</h2>
-    <button class="new-message-btn">+ New Message</button>
-    <div class="conversation-list">
-      <button class="conversation-btn">Alice</button>
-      <button class="conversation-btn">Bob</button>
-      <button class="conversation-btn">Charlie</button>
-    </div>
-  </div>
+<body style="font-family:Arial; padding:2rem;">
+  <h1>Cypher Encryption Demo</h1>
 
-  <!-- Chat area -->
-  <div class="chat-area">
-    <div class="chat-header">
-      <h3>Conversation with Alice</h3>
-    </div>
-    <div class="chat-window">
-      <div class="message received">Hey there! How are you?</div>
-      <div class="message sent">I’m good, thanks! How about you?</div>
-      <div class="message received">Doing well, excited for this project!</div>
-    </div>
-  </div>
+  <!-- Message input -->
+  <textarea id="message" rows="4" cols="50" placeholder="Type a message..."></textarea><br><br>
+  <button id="run">Encrypt & Decrypt</button>
+  <pre id="output"></pre>
+
+  <hr/>
+
+  <!-- Key management -->
+  <h2>Public Key Management</h2>
+  <button id="exportKey">Export Public Key</button><br><br>
+
+  <textarea id="importKeyInput" rows="4" cols="50" placeholder="Paste a public key here..."></textarea><br>
+  <button id="importKey">Import Public Key</button>
+  <pre id="importResult"></pre>
+
+  <!-- Reference external JavaScript -->
+  <script>
+    // ============================================================
+// ALPHABET MAPS
+// ============================================================
+const alphabetMap = {
+  ...Object.fromEntries(Array.from({length: 26}, (_, i) => [String.fromCharCode(97+i), i])),
+  ...Object.fromEntries(Array.from({length: 10}, (_, i) => [String(i), 26+i])),
+  " ": 36, ".": 37, ",": 38, "!": 39, "?": 40,
+  "'": 41, "\"": 42, ":": 43, ";": 44, "-": 45,
+  "(": 46, ")": 47
+};
+const reverseMap = Object.fromEntries(Object.entries(alphabetMap).map(([k,v]) => [v,k]));
+
+function textToNumbers(s) {
+  return [...s.toLowerCase()].map(c => alphabetMap[c]).filter(v => v !== undefined);
+}
+function numbersToText(nums) {
+  return nums.map(n => reverseMap[n] || "").join("");
+}
+
+// ============================================================
+// OTP FUNCTIONS
+// ============================================================
+function generateOtp(length) {
+  const otp = new Uint8Array(length);
+  crypto.getRandomValues(otp); // fills array with cryptographically secure random bytes
+
+  // Reduce each byte modulo the alphabet size to fit our mapping
+  return Array.from(otp, b => b % Object.keys(alphabetMap).length);
+}
+
+// Encrypt message numbers with OTP key
+function otpEncrypt(numbers, key) {
+  return numbers.map((n, i) => (n + key[i]) % Object.keys(alphabetMap).length);
+}
+
+// Decrypt message numbers with OTP key
+function otpDecrypt(numbers, key) {
+  return numbers.map((c, i) => (c - key[i] + Object.keys(alphabetMap).length) % Object.keys(alphabetMap).length);
+}
+
+// ============================================================
+// RSA KEY MANAGEMENT (WebCrypto)
+// ============================================================
+async function generateRSAKeys() {
+  return await crypto.subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 2048,
+      publicExponent: new Uint8Array([1,0,1]),
+      hash: "SHA-256"
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+}
+async function exportKey(key) {
+  const exported = await crypto.subtle.exportKey("spki", key);
+  return btoa(String.fromCharCode(...new Uint8Array(exported)));
+}
+async function importPublicKey(base64Key) {
+  const binary = Uint8Array.from(atob(base64Key), c => c.charCodeAt(0));
+  return await crypto.subtle.importKey(
+    "spki",
+    binary.buffer,
+    {name: "RSA-OAEP", hash: "SHA-256"},
+    true,
+    ["encrypt"]
+  );
+}
+
+// ============================================================
+// HMAC (SHA-256)
+// ============================================================
+async function generateHmac(keyBytes, messageBytes) {
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    new Uint8Array(keyBytes),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const sig = await crypto.subtle.sign("HMAC", cryptoKey, new Uint8Array(messageBytes));
+  return Array.from(new Uint8Array(sig)).map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+// ============================================================
+// HYBRID ENCRYPT / DECRYPT
+// ============================================================
+async function hybridEncrypt(message, publicKey) {
+  const msgNumbers = textToNumbers(message);
+  const otpKey = generateOtp(msgNumbers.length);
+  const encryptedMessage = otpEncrypt(msgNumbers, otpKey);
+
+  // Encrypt OTP values with RSA
+  const encryptedOtpKey = await Promise.all(
+    otpKey.map(async k => {
+      const enc = await crypto.subtle.encrypt({name:"RSA-OAEP"}, publicKey, new Uint8Array([0, k]));
+      return btoa(String.fromCharCode(...new Uint8Array(enc)));
+    })
+  );
+
+  // Generate HMAC
+  const mac = await generateHmac(otpKey, encryptedMessage);
+
+  return { encrypted_message: encryptedMessage, encrypted_otp_key: encryptedOtpKey, hmac: mac };
+}
+
+async function hybridDecrypt(pkg, privateKey) {
+  // Decrypt OTP
+  const otpKey = await Promise.all(
+    pkg.encrypted_otp_key.map(async encStr => {
+      const binary = Uint8Array.from(atob(encStr), c => c.charCodeAt(0));
+      const dec = await crypto.subtle.decrypt({name:"RSA-OAEP"}, privateKey, binary.buffer);
+      return new Uint8Array(dec)[1]; // integer value
+    })
+  );
+
+  // Verify HMAC
+  const macCheck = await generateHmac(otpKey, pkg.encrypted_message);
+  if (macCheck !== pkg.hmac) throw new Error("Message integrity check failed!");
+
+  const decryptedNumbers = otpDecrypt(pkg.encrypted_message, otpKey);
+  return numbersToText(decryptedNumbers);
+}
+
+// ============================================================
+// DEMO WIRED UP TO THE PAGE
+// ============================================================
+let keys;
+async function setup() {
+  keys = await generateRSAKeys();
+}
+document.getElementById("run").addEventListener("click", async () => {
+  const msg = document.getElementById("message").value;
+  const encryptedPkg = await hybridEncrypt(msg, keys.publicKey);
+  const decryptedMsg = await hybridDecrypt(encryptedPkg, keys.privateKey);
+
+  document.getElementById("output").textContent =
+    "Original: " + msg + "\n\n" +
+    "Encrypted Package:\n" + JSON.stringify(encryptedPkg, null, 2) + "\n\n" +
+    "Decrypted: " + decryptedMsg;
+});
+
+// Export public key
+document.getElementById("exportKey").addEventListener("click", async () => {
+  const exported = await exportKey(keys.publicKey);
+  alert("Public Key copied to clipboard.");
+  await navigator.clipboard.writeText(exported);
+});
+
+// Import someone else’s public key
+document.getElementById("importKey").addEventListener("click", async () => {
+  const base64Key = document.getElementById("importKeyInput").value.trim();
+  try {
+    const importedKey = await importPublicKey(base64Key);
+    document.getElementById("importResult").textContent = "✅ Public key imported successfully!";
+    // Store for later use
+    window.recipientPublicKey = importedKey;
+  } catch (err) {
+    document.getElementById("importResult").textContent = "❌ Failed to import key.";
+  }
+});
+
+setup();
+
+
+
+
+  </script>
 </body>
 </html>
