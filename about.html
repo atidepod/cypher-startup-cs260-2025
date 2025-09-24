@@ -17,6 +17,11 @@
     </tr>
   </table>
   <h1>Cypher Encryption Demo</h1>
+  <p><font color="white">This is a quick demo of what goes on behind the scenes with this messaging software. A plaintext message is encrypted using 
+    a One-Time-Pad style algorithem. A new random key is generated for each message, ensuring security. 
+    The random key is also encrypted using a RSA Modulus cypher, and is packed with HMAC noise to ensure message integrety. 
+    Type something into the message box to see the raw values that are sent to your friends. 
+  </font></p>
 
   <!-- Message input -->
   <textarea id="message" rows="4" cols="50" placeholder="Type a message..."></textarea><br><br>
