@@ -54,3 +54,6 @@ I am going to use the required technologies in the following ways.
 - **DB/Login** - Used to secure users private and public keys, register accounts, and provide message access across multiple devices
 - **WebSocket** - Used to communicate with the servers
 
+### HTML Startup
+This is a description of what I did in the HTML startup submission. I built three pages: a login page, a messaging page, and an about page. These pages are interlinked via the nav bar up top. The login portal is a placeholder for now. On the messages page, I installed a database placeholder on the left where past conversations are storred. I installed a websocket placeholder in the center of the page, where a current conversation would require real time communication between the website and the server. In the "about" page, I included a quick demo of the input and outputs that this website deals with, feel free to try it out! It took forever to translate the original python code into the javascript that the page runs on. 
+
