@@ -1,0 +1,123 @@
+/* Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: url("background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #333;
+  padding: 1rem;
+}
+.navbar .logo {
+  font-weight: bold;
+}
+.navbar .nav-links a, 
+.navbar .nav-links span {
+  color: white;
+  margin-left: 1rem;
+  text-decoration: none;
+}
+.navbar .nav-links a:hover {
+  text-decoration: underline;
+}
+
+/* Layout */
+.container {
+  display: flex;
+  height: calc(100% - 120px); /* full height minus navbar+footer */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 25%;
+  background: #444;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+.sidebar button {
+  margin: 0.3rem 0;
+  padding: 0.5rem;
+  border: none;
+  background: #666;
+  color: white;
+  cursor: pointer;
+}
+.sidebar button:hover {
+  background: #888;
+}
+
+/* Chat area */
+.chat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: rgba(0,0,0,0.6);
+  margin: 0.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.chat-header {
+  padding: 1rem;
+  background: #222;
+}
+.chat-window {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.message {
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  max-width: 70%;
+}
+.message.sent {
+  background: #333;
+  margin-left: auto;
+  text-align: right;
+}
+.message.received {
+  background: #555;
+  margin-right: auto;
+  text-align: left;
+}
+.chat-input {
+  display: flex;
+  padding: 1rem;
+  background: #222;
+}
+.chat-input input {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 4px;
+}
+.chat-input button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #666;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+.chat-input button:hover {
+  background: #888;
+}
+
+/* Footer */
+.footer {
+  background: #333;
+  text-align: center;
+  padding: 1rem;
+}
