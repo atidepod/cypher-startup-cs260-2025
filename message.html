@@ -1,75 +1,56 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Cypher Message</title>
+  <link rel="stylesheet" href="~/src/mstyles.css" />
 </head>
-<body background="background.jpg">
+<body>
 
-  <nav>
-    <table width="100%" bgcolor="#333" cellpadding="10">
-      <tr>
-        <td align="left"><font color="white"><b>Cypher</b></font></td>
-        <td align="right">
-          <font color="white">Welcome User 1!</font> |
-          <a href="index.html"><font color="white">Home</font></a> |
-          <a href="about.html"><font color="white">About</font></a> |
-          <a href="https://github.com/atidepod/cypher-startup-cs260-2025"><font color="white">Github</font></a>
-        </td>
-      </tr>
-    </table>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo">Cypher</div>
+    <div class="nav-links">
+      <span>Welcome User 1!</span>
+      <a href="index.html">Home</a>
+      <a href="about.html">About</a>
+      <a href="https://github.com/atidepod/cypher-startup-cs260-2025">Github</a>
+    </div>
   </nav>
 
-  <main>
-    <table border="0" width="100%" height="80%">
-      <tr valign="top">
-       
-        <td width="25%" bgcolor="#444" valign="top">
-          <h2><font color="white">Messages</font></h2>
-          <h2><font color="white">"Database Example"</font></h2>
-          <p><button>+ New Message</button></p>
-          <p><button>Alice</button></p>
-          <p><button>Bob</button></p>
-          <p><button>Charlie</button></p>
-        </td>
+  <!-- Main layout -->
+  <main class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h2>Messages</h2>
+      <h3>"Database Example"</h3>
+      <button>+ New Message</button>
+      <button>Alice</button>
+      <button>Bob</button>
+      <button>Charlie</button>
+    </aside>
 
-        <td width="55%" valign="left">
-          
-          <table border="0" width="100%" bgcolor="#222" cellpadding="10">
-            <tr>
-              <td align="left">
-                <h3><font color="white">Websocket placeholder representing real time communication</font></h3>
-                <p><font color="white">Hey there! How are you?</font></p>
-              </td>
-            </tr>
-            <tr>
-              <td align="right">
-                <p><font color="white">I’m good, thanks! How about you?</font></p>
-              </td>
-            </tr>
-            <tr>
-              <td align="left">
-                <p><font color="white">Doing well, excited for this project!</font></p>
-              </td>
-            </tr>
-            <tr>
-              <td align="center">
-                <input type="text" placeholder="Type a message..." size="50" />
-                <button>Send</button>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-    </table>
+    <!-- Chat area -->
+    <section class="chat">
+      <div class="chat-header">
+        <h3>Websocket placeholder representing real time communication</h3>
+      </div>
+      <div class="chat-window">
+        <div class="message received">Hey there! How are you?</div>
+        <div class="message sent">I’m good, thanks! How about you?</div>
+        <div class="message received">Doing well, excited for this project!</div>
+      </div>
+      <div class="chat-input">
+        <input type="text" placeholder="Type a message..." />
+        <button>Send</button>
+      </div>
+    </section>
   </main>
 
-  <footer>
-    <table width="100%" bgcolor="#333" cellpadding="10">
-      <tr>
-        <td align="center"><font color="white">© 2025 Cypher.</font></td>
-      </tr>
-    </table>
+  <!-- Footer -->
+  <footer class="footer">
+    © 2025 Cypher
   </footer>
 
 </body>

@@ -6,7 +6,7 @@ function App() {
   const socketRef = useRef(null);
 
   useEffect(() => {
-    socketRef.current = new WebSocket('ws://localhost:8080'); // replace with wss://yourdomain.com in production
+    socketRef.current = new WebSocket('ws://cypherw.click'); // replace with wss://yourdomain.com in production
 
     socketRef.current.onmessage = (event) => {
       setMessages((prev) => [...prev, event.data]);
