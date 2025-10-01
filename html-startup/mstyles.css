@@ -10,20 +10,17 @@ body, html {
 
 /* Navbar overrides */
 .navbar {
-  background-color: #212529 !important; /* dark mode navbar */
+  background-color: #212529 !important; /* dark navbar */
 }
 .navbar-brand {
   font-weight: bold;
-  color: #fff !important;
 }
 .nav-link {
-  color: #ddd !important;
+  color: white !important;
 }
 .nav-link:hover {
-  color: #fff !important;
   text-decoration: underline;
 }
-
 /* Layout */
 .container-fluid {
   height: calc(100% - 120px); /* minus navbar + footer */
