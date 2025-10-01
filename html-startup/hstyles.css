@@ -1,0 +1,66 @@
+/* General */
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: url("background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.navbar {
+  background-color: #212529 !important;
+}
+.navbar-brand {
+  font-weight: bold;
+}
+.nav-link {
+  color: white !important;
+}
+.nav-link:hover {
+  text-decoration: underline;
+}
+
+/* Login Card */
+.login-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.login-card {
+  background: rgba(0,0,0,0.7);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+.login-card h2 {
+  margin-bottom: 1.5rem;
+}
+.login-card input {
+  background: #222;
+  border: 1px solid #444;
+  color: white;
+}
+.login-card input:focus {
+  border-color: #0d6efd;
+  box-shadow: none;
+}
+.login-card button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #0d6efd;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: bold;
+}
+.login-card button:hover {
+  background: #0b5ed7;
+}
