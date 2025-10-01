@@ -3,50 +3,51 @@
 <head>
   <meta charset="UTF-8">
   <title>Cypher Encryption Demo</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link rel="stylesheet" href="astyles.css" />
 </head>
-<body background="background.jpg">
-    <table width="100%" bgcolor="#333" cellpadding="10">
-    <tr>
-      <td align="left"><font color="white"><b>Cypher</b></font></td>
-      <td align="right">
-        <font color="white">Welcome User 1!</font> |
-        <a href="index.html"><font color="white">Home</font></a> |
-        <a href="message.html"><font color="white">Messages</font></a> |
-        
-        <a href="https://github.com/atidepod/cypher-startup-cs260-2025"><font color="white">Github</font></a>
-      </td>
-    </tr>
-  </table>
-  <h1><font color="white">Cypher Encryption Demo</font></h1>
-  <p><font color="white">This is a quick demo of what goes on behind the scenes with this messaging software. A plaintext message is encrypted using 
-    a One-Time-Pad style algorithem. A new random key is generated for each message, ensuring security. 
-    The random key is also encrypted using a RSA Modulus cypher, and is packed with HMAC noise to ensure message integrety. 
-    Type something into the example box to see the raw values that make up your messages. 
-  </font></p>
+<body>
 
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">Cypher</a>
+      <div class="collapse navbar-collapse justify-content-end">
+        <ul class="navbar-nav">
+          <li class="nav-item"><span class="nav-link">Welcome User 1!</span></li>
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="message.html">Messages</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://github.com/atidepod/cypher-startup-cs260-2025">Github</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-  <textarea id="message" rows="4" cols="50" placeholder="Type a message..."></textarea><br><br>
-  <button id="run">Encrypt & Decrypt</button>
-  <pre id="output"></pre>
+  <!-- Main Content -->
+  <div class="container">
+    <h1>Cypher Encryption Demo</h1>
+    <p>
+      This is a quick demo of what goes on behind the scenes with this messaging software. 
+      A plaintext message is encrypted using a One-Time-Pad style algorithm. A new random key 
+      is generated for each message, ensuring security. The random key is also encrypted using 
+      a RSA Modulus cypher, and is packed with HMAC noise to ensure message integrity. 
+      Type something into the example box to see the raw values that make up your messages.
+    </p>
 
-  <hr/>
+    <div class="mb-3">
+      <textarea id="message" rows="4" class="form-control" placeholder="Type a message..."></textarea>
+    </div>
+    <button id="run" class="btn btn-primary">Encrypt & Decrypt</button>
 
-  <!-- Key management ____to be used later_____
-  <h2>Public Key Management</h2>
-  <button id="exportKey">Export Public Key</button><br><br>
+    <div class="mt-4">
+      <pre id="output"></pre>
+    </div>
+  </div>
 
-  <textarea id="importKeyInput" rows="4" cols="50" placeholder="Paste a public key here..."></textarea><br>
-  <button id="importKey">Import Public Key</button>
-  <pre id="importResult"></pre>
--->
-  <script src="aboutJS.js"></script>>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-</body>
-
-  
-
-
+  <script src="aboutJS.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <footer class="footer">
+    © 2025 Cypher
+  </footer>
 </body>
 </html>
