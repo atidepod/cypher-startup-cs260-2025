@@ -1,11 +1,14 @@
 /* Reset / Base */
 body, html {
-  height: 100%;
   margin: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
   background: url("background.jpg") no-repeat center center fixed;
   background-size: cover;
   color: white;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Navbar overrides */
