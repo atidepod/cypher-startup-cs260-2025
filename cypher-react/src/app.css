@@ -1,0 +1,186 @@
+/* ================================
+   Global Theme
+==================================*/
+.body, html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: url("background.jpg") no-repeat center center fixed;
+  background-size: cover;
+  color: white;
+}
+
+/* Navbar */
+.navbar {
+  background: #222 !important;
+}
+.navbar-brand {
+  font-weight: bold;
+}
+.navbar .nav-link {
+  color: #ccc !important;
+}
+.navbar .nav-link:hover {
+  color: white !important;
+}
+
+/* Footer */
+.footer {
+  background: #222;
+  text-align: center;
+  padding: 1rem;
+  color: #ccc;
+}
+
+/* ================================
+   Login Page
+==================================*/
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: calc(100vh - 56px); /* minus navbar height */
+  padding: 2rem;
+}
+.login-card {
+  background: rgba(0,0,0,0.8);
+  padding: 2rem;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+.login-card h2 {
+  margin-bottom: 1.5rem;
+}
+.login-card .btn-primary {
+  background-color: #444;
+  border: none;
+}
+.login-card .btn-primary:hover {
+  background-color: #666;
+}
+
+/* ================================
+   Messages Page
+==================================*/
+.container-fluidq {
+  display: flex;
+  flex-direction: row; /* sidebar left, chat right */
+  height: calc(100vh - 112px); /* full viewport minus navbar + footer */
+  gap: 0.5rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px; /* fixed width for sidebar */
+  min-width: 200px;
+  background-color: #343a40;
+  padding: 1rem;
+  border-right: 1px solid #444;
+  height: 100%;
+  overflow-y: auto;
+  border-radius: 0.5rem;
+}
+.sidebar h5 {
+  margin-bottom: 1rem;
+}
+.sidebar .btn {
+  width: 100%;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+/* Chat */
+.chat {
+  flex: 1; /* take remaining width */
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0,0,0,0.65);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.chat-header {
+  padding: 1rem;
+  background-color: #212529;
+  border-bottom: 1px solid #444;
+}
+.chat-window {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+.message {
+  margin: 0.5rem 0;
+  padding: 0.6rem 1rem;
+  border-radius: 1rem;
+  max-width: 70%;
+}
+.message.sent {
+  background-color: #0d6efd; /* Bootstrap primary */
+  margin-left: auto;
+  color: white;
+}
+.message.received {
+  background-color: #6c757d; /* Bootstrap secondary */
+  margin-right: auto;
+  color: white;
+}
+.chat-input {
+  display: flex;
+  padding: 0.75rem;
+  background-color: #212529;
+  border-top: 1px solid #444;
+}
+.chat-input input {
+  flex: 1;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.5rem;
+}
+.chat-input button {
+  margin-left: 0.5rem;
+}
+
+/* ================================
+   About Page
+==================================*/
+.about-container {
+  padding: 2rem;
+}
+.about-container h1, 
+.about-container p {
+  color: white;
+}
+
+/* Encryption demo output box */
+pre {
+  background: #000;
+  color: #0f0;
+  padding: 1rem;
+  border-radius: 6px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: monospace;
+}
+
+/* ================================
+   Responsiveness
+==================================*/
+/* Responsive: stack sidebar on top for small screens */
+@media (max-width: 768px) {
+  .container-fluid {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    margin-bottom: 0.5rem;
+  }
+  .chat {
+    width: 100%;
+  }
+}
