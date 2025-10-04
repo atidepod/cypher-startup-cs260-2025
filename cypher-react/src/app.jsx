@@ -21,7 +21,7 @@ export default function App() {
               </button>
               <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul className="navbar-nav">
-                  <li className="nav-item"><a className="nav-link" href="login">Login</a></li>
+                  <li className="nav-item"><a className="nav-link" href="/">Login</a></li>
                   <li className="nav-item"><a className="nav-link" href="message">Messages</a></li>
                   <li className="nav-item"><a className="nav-link active" href="about">About</a></li>
                   <li className="nav-item"><a className="nav-link" href="https://github.com/atidepod/cypher-startup-cs260-2025">Github</a></li>
