@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './app.css';
 
@@ -21,9 +21,16 @@ export default function App() {
               </button>
               <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul className="navbar-nav">
-                  <li className="nav-item"><a className="nav-link" href="/">Login</a></li>
-                  <li className="nav-item"><a className="nav-link" href="message">Messages</a></li>
-                  <li className="nav-item"><a className="nav-link active" href="about">About</a></li>
+                  <li className="nav-item">
+                    <NavLink className="nav-link" to="/">Login</NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink className="nav-link" to="/message">Messages</NavLink>
+                  </li>
+                  <li className="nav-item">
+                    <NavLink className="nav-link" to="/about">About</NavLink>
+                  </li>
+
                   <li className="nav-item"><a className="nav-link" href="https://github.com/atidepod/cypher-startup-cs260-2025">Github</a></li>
                 </ul>
               </div>
