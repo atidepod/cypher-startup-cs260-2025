@@ -1,98 +1,76 @@
 import React, { useState, useRef, useEffect } from "react";
-import { BrowserRouter, NavLink, Route, Routes } from 'react-router-dom';
-import { Login } from '../login/login.jsx';
-import { About } from '../about/about.jsx';
 import { textToNumbers, numbersToText, generateOtp, otpEncrypt, otpDecrypt } from "./encrypt.js";
-import '../app.css';
+import "../app.css";
 
 export function Message() {
-  const [messages, setMessages] = useState([
-    { text: "You are not alone", encrypted: "", type: "received" },
-  ]);
+  const [currentChat, setCurrentChat] = useState("Andrew");
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const chatEndRef = useRef(null);
-  const [keys, setKeys] = useState(null);
-  const [isLocked, setIsLocked] = useState(false);
-  const [userPassword, setUserPassword] = useState("royer"); // example password
+  const [locked, setLocked] = useState(false);
+  const [password, setPassword] = useState("royer"); // simple password for unlock
 
-  // Generate RSA keys (not yet used for lock/unlock, but ready for later)
+  // Load messages from localStorage when chat changes
   useEffect(() => {
-    async function generateKeys() {
-      const keyPair = await crypto.subtle.generateKey(
-        { name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" },
-        true,
-        ["encrypt", "decrypt"]
-      );
-      setKeys(keyPair);
+    const saved = localStorage.getItem(`chat_${currentChat}`);
+    if (saved) {
+      setMessages(JSON.parse(saved));
+    } else {
+      setMessages([{ text: `New chat with ${currentChat}`, type: "received", encrypted: "" }]);
     }
-    generateKeys();
-  }, []);
+  }, [currentChat]);
+
+  // Save messages to localStorage when they change
+  useEffect(() => {
+    localStorage.setItem(`chat_${currentChat}`, JSON.stringify(messages));
+  }, [messages, currentChat]);
 
   // Auto-scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Send button handler — encrypt before displaying
+  // Keyboard shortcut: Ctrl + L → Lock/Unlock
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
+        toggleLockdown();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Encrypt message
   const handleSend = async () => {
     if (input.trim() === "") return;
 
     const msgNumbers = textToNumbers(input);
     const otpKey = generateOtp(msgNumbers.length);
     const encryptedMessage = otpEncrypt(msgNumbers, otpKey);
-    const encryptedText = encryptedMessage.join(" "); // numeric cipher text
+    const encryptedText = encryptedMessage.join(" ");
     const decryptedText = numbersToText(otpDecrypt(encryptedMessage, otpKey));
 
     setMessages((prev) => [
       ...prev,
-      { text: decryptedText, encrypted: encryptedText, otp: otpKey, type: "sent" }
+      { text: decryptedText, encrypted: encryptedText, type: "sent" },
     ]);
     setInput("");
   };
 
-  // 🔒 Lockdown — switch all visible text to encrypted form
-  const handleLockdown = () => {
-    setIsLocked(true);
-    setMessages((prev) =>
-      prev.map((msg) => ({
-        ...msg,
-        displayText: msg.encrypted || msg.text,
-      }))
-    );
-  };
-
-  // 🔓 Unlock — prompt for password to restore plain text
-  const handleUnlock = () => {
-    const entered = prompt("Enter password to unlock messages:");
-    if (entered === userPassword) {
-      setIsLocked(false);
-      setMessages((prev) =>
-        prev.map((msg) => ({
-          ...msg,
-          displayText: msg.text,
-        }))
-      );
+  // Lockdown toggle
+  const toggleLockdown = () => {
+    if (!locked) {
+      setLocked(true);
     } else {
-      alert("Incorrect password!");
+      const userInput = prompt("Enter password to unlock:");
+      if (userInput === password) {
+        setLocked(false);
+      } else {
+        alert("Incorrect password!");
+      }
     }
   };
-
-  // 🎹 Keyboard shortcut: Ctrl+L (or Cmd+L)
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
-        e.preventDefault();
-        if (isLocked) {
-          handleUnlock();
-        } else {
-          handleLockdown();
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLocked]); // depends on isLocked so it stays in sync
 
   return (
     <main className="container">
@@ -100,30 +78,28 @@ export function Message() {
         {/* Sidebar */}
         <div className="sidebar">
           <h5 className="text-white mb-3">Conversations</h5>
-          <button className="btn btn-dark">Andrew</button>
-          <button className="btn btn-dark">Bob</button>
-          <button className="btn btn-dark">Charlie</button>
+          {["Andrew", "Bob", "Charlie"].map((name) => (
+            <button
+              key={name}
+              className={`btn ${currentChat === name ? "btn-primary" : "btn-dark"} mb-2`}
+              onClick={() => setCurrentChat(name)}
+            >
+              {name}
+            </button>
+          ))}
           <hr />
-          {isLocked ? (
-            <button className="btn btn-success" onClick={handleUnlock}>
-              🔓 Unlock
-            </button>
-          ) : (
-            <button className="btn btn-danger" onClick={handleLockdown}>
-              🔒 Lockdown
-            </button>
-          )}
-          <p style={{ fontSize: "0.8rem", color: "white" }}>
+          <button className="btn btn-danger w-100" onClick={toggleLockdown}>
+            {locked ? "Unlock 🔓" : "Lock 🔒"}
+          </button>
+          <p style={{ fontSize: "0.8rem", color: "white", marginTop: "10px" }}>
             Shortcut: <strong>Ctrl + e</strong>
           </p>
         </div>
 
-        {/* Chat */}
+        {/* Chat Section */}
         <div className="chat">
           <div className="chat-header">
-            <h5>
-              Active Chat {isLocked && "(Locked)"}
-            </h5>
+            <h5>{currentChat}'s Chat {locked && "(Locked 🔒)"}</h5>
           </div>
 
           <div className="chat-window">
@@ -131,21 +107,21 @@ export function Message() {
               <div
                 key={index}
                 className={`message ${msg.type}`}
-                title={msg.encrypted}
+                title={locked ? msg.encrypted : msg.text}
                 onMouseEnter={(e) => {
-                  if (!isLocked) e.currentTarget.textContent = msg.encrypted;
+                  if (!locked) e.currentTarget.textContent = msg.encrypted;
                 }}
                 onMouseLeave={(e) => {
-                  if (!isLocked) e.currentTarget.textContent = msg.text;
+                  if (!locked) e.currentTarget.textContent = msg.text;
                 }}
               >
-                {isLocked ? msg.encrypted : msg.text}
+                {locked ? msg.encrypted : msg.text}
               </div>
             ))}
             <div ref={chatEndRef} />
           </div>
 
-          {!isLocked && (
+          {!locked && (
             <div className="chat-input">
               <input
                 type="text"
