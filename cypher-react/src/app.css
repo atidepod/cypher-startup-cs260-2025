@@ -47,6 +47,7 @@ html {
   min-height: calc(100vh - 56px);
   /* minus navbar height */
   padding: 2rem;
+  color:white;
 }
 
 .login-card {
@@ -60,6 +61,7 @@ html {
 
 .login-card h2 {
   margin-bottom: 1.5rem;
+  color:white;
 }
 
 .login-card .btn-primary {

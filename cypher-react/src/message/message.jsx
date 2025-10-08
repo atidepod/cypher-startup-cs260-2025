@@ -92,7 +92,7 @@ export function Message() {
             {locked ? "Unlock 🔓" : "Lock 🔒"}
           </button>
           <p style={{ fontSize: "0.8rem", color: "white", marginTop: "10px" }}>
-            Shortcut: <strong>Ctrl + e</strong>
+            Shortcut: <strong>Ctrl + e</strong> Password: royer
           </p>
         </div>
 
