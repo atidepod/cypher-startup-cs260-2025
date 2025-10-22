@@ -70,12 +70,12 @@ export default function App() {
       </Routes>
 
       <footer className="footer">
-        © 2025 Cypher
+        © 2025 Cypher, Elijah Royer
       </footer>
     </BrowserRouter>
   );
 }
 
 function NotFound() {
-  return <main className="container-fluid bg-secondary text-center">404: LOL Return to sender. Address unknown.</main>;
+  return <main className="container-fluid bg-secondary text-center">404: LOL get wrecked. Return to sender. Address unknown.</main>;
 }
