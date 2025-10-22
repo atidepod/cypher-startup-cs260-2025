@@ -10,7 +10,6 @@ export function Message() {
   const [locked, setLocked] = useState(false);
   const [password, setPassword] = useState("royer"); // simple password for unlock
 
-  // Load messages from localStorage when chat changes
   useEffect(() => {
     const saved = localStorage.getItem(`chat_${currentChat}`);
     if (saved) {
@@ -20,17 +19,14 @@ export function Message() {
     }
   }, [currentChat]);
 
-  // Save messages to localStorage when they change
   useEffect(() => {
     localStorage.setItem(`chat_${currentChat}`, JSON.stringify(messages));
   }, [messages, currentChat]);
 
-  // Auto-scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Keyboard shortcut: Ctrl + L → Lock/Unlock
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
@@ -41,7 +37,6 @@ export function Message() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // Encrypt message
   const handleSend = async () => {
     if (input.trim() === "") return;
 
@@ -58,7 +53,6 @@ export function Message() {
     setInput("");
   };
 
-  // Lockdown toggle
   const toggleLockdown = () => {
     if (!locked) {
       setLocked(true);
@@ -93,6 +87,12 @@ export function Message() {
           </button>
           <p style={{ fontSize: "0.8rem", color: "white", marginTop: "10px" }}>
             Shortcut: <strong>Ctrl + e</strong> Password: royer
+            Thanks for being here! Feel free to type 
+            a message into any of the chats. "hover"
+            your mouse over the message to see the 
+            encrypted message. The lock "button"
+            hides your message and requires
+            the password to view them. 
           </p>
         </div>
 
