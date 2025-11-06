@@ -16,7 +16,7 @@ export function Message({ sessionId, username, onLogout }) {
   // Fetch messages from server
   const fetchMessages = async (chat) => {
     try {
-      const res = await fetch(`http://localhost:3001/api/messages/${chat}`, {
+      const res = await fetch(`/api/messages/${chat}`, {
         method: "GET", // or POST
         headers: {
           "Content-Type": "application/json",
@@ -59,7 +59,7 @@ const handleSend = async () => {
 
   // Send encrypted message to server
   try {
-    const res = await fetch(`http://localhost:3001/api/messages/${chat}`, {
+    const res = await fetch(`/api/messages/${chat}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

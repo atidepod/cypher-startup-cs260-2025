@@ -6,7 +6,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // --- Helpers for __dirname in ES modules ---
 const __filename = fileURLToPath(import.meta.url);
@@ -14,9 +14,13 @@ const __dirname = path.dirname(__filename);
 
 // --- Middleware ---
 app.use(cors({
-  origin: "http://localhost:5173", // your frontend origin
+  origin: [
+    "http://localhost:5173",
+    "https://startup.cypherw.click"
+  ],
   credentials: true
 }));
+
 app.use(bodyParser.json());
 
 // --- In-memory storage ---
@@ -86,11 +90,12 @@ app.post("/api/messages/:chat", requireAuth, (req, res) => {
 });
 
 // --- Serve frontend via static middleware ---
-app.use(express.static(path.join(__dirname, "dist"))); // change "dist" if your build folder is different
+const publicPath = path.join(__dirname, "public");
+app.use(express.static(publicPath));
 
 // --- Catch-all for React Router ---
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, "dist", "index.html"));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(publicPath, "index.html"));
 });
 
 // --- Start server ---
