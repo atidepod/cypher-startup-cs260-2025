@@ -1,74 +1,101 @@
 import React, { useState, useRef, useEffect } from "react";
 import { textToNumbers, numbersToText, generateOtp, otpEncrypt, otpDecrypt } from "./encrypt.js";
+import { Login } from '../login/login.jsx';
+import { About } from '../about/about';
 import "../app.css";
 
-export function Message() {
+export function Message({ sessionId, username, onLogout }) {
   const [currentChat, setCurrentChat] = useState("Andrew");
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const chatEndRef = useRef(null);
   const [locked, setLocked] = useState(false);
-  const [password, setPassword] = useState("royer"); // simple password for unlock
+  const chatEndRef = useRef(null);
+  const [chat, setChat] = useState("default");
 
-  // Load messages from localStorage when chat changes
-  useEffect(() => {
-    const saved = localStorage.getItem(`chat_${currentChat}`);
-    if (saved) {
-      setMessages(JSON.parse(saved));
-    } else {
-      setMessages([{ text: `New chat with ${currentChat}`, type: "received", encrypted: "" }]);
+
+  // Fetch messages from server
+  const fetchMessages = async (chat) => {
+    try {
+      const res = await fetch(`http://localhost:3001/api/messages/${chat}`, {
+        method: "GET", // or POST
+        headers: {
+          "Content-Type": "application/json",
+          "x-session-id": sessionId // MUST match backend
+        },
+      });
+      const data = await res.json();
+      if (!data.messages) return;
+
+      setMessages(prev => [
+        ...prev,
+        { text: input, encrypted: encryptedText, type: "sent" }
+      ]);
+      setInput("");
+
+    } catch (err) {
+      console.error(err);
     }
-  }, [currentChat]);
+  };
 
-  // Save messages to localStorage when they change
+  // Send new message
+const handleSend = async () => {
+
+  if (input.trim() === "") return;
+
+  const msgNumbers = textToNumbers(input);
+  const otpKey = generateOtp(msgNumbers.length);
+  const encryptedMessage = otpEncrypt(msgNumbers, otpKey);
+  const encryptedText = encryptedMessage.join(" ");
+  const decryptedText = numbersToText(otpDecrypt(encryptedMessage, otpKey));
+
+  // Optimistically add message to UI
+  const newMsg = {
+    type: "outgoing",
+    text: decryptedText,
+    encrypted: encryptedText,
+  };
+  setMessages(prev => [...prev, newMsg]);
+  setInput("");
+
+  // Send encrypted message to server
+  try {
+    const res = await fetch(`http://localhost:3001/api/messages/${chat}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-session-id": sessionId
+      },
+      body: JSON.stringify({ encrypted: encryptedText, otp: otpKey })
+    });
+
+  } catch (err) {
+    console.error(err);
+    // Optional: remove the message if sending fails
+    // setMessages(prev => prev.filter(m => m !== newMsg));
+  }
+};
+
+
+  // Auto-fetch messages every 3 seconds
   useEffect(() => {
-    localStorage.setItem(`chat_${currentChat}`, JSON.stringify(messages));
-  }, [messages, currentChat]);
+    fetchMessages(currentChat);
+    const interval = setInterval(() => fetchMessages(currentChat), 3000);
+    return () => clearInterval(interval);
+  }, [currentChat, sessionId]);
 
   // Auto-scroll
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Keyboard shortcut: Ctrl + L → Lock/Unlock
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "e") {
-        toggleLockdown();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  // Encrypt message
-  const handleSend = async () => {
-    if (input.trim() === "") return;
-
-    const msgNumbers = textToNumbers(input);
-    const otpKey = generateOtp(msgNumbers.length);
-    const encryptedMessage = otpEncrypt(msgNumbers, otpKey);
-    const encryptedText = encryptedMessage.join(" ");
-    const decryptedText = numbersToText(otpDecrypt(encryptedMessage, otpKey));
-
-    setMessages((prev) => [
-      ...prev,
-      { text: decryptedText, encrypted: encryptedText, type: "sent" },
-    ]);
-    setInput("");
-  };
-
-  // Lockdown toggle
+  // Lock toggle
   const toggleLockdown = () => {
     if (!locked) {
       setLocked(true);
     } else {
       const userInput = prompt("Enter password to unlock:");
-      if (userInput === password) {
-        setLocked(false);
-      } else {
-        alert("Incorrect password!");
-      }
+      if (userInput === "royer") setLocked(false);
+      else alert("Incorrect password!");
     }
   };
 
@@ -91,14 +118,11 @@ export function Message() {
           <button className="btn btn-danger w-100" onClick={toggleLockdown}>
             {locked ? "Unlock 🔓" : "Lock 🔒"}
           </button>
+          <button className="btn btn-secondary w-100 mt-2" onClick={onLogout}>
+            Logout
+          </button>
           <p style={{ fontSize: "0.8rem", color: "white", marginTop: "10px" }}>
             Shortcut: <strong>Ctrl + e</strong> Password: royer
-            Thanks for being here! Feel free to type 
-            a message into any of the chats. "hover"
-            your mouse over the message to see the 
-            encrypted message. The lock "button"
-            hides your message and requires
-            the password to view them. 
           </p>
         </div>
 
@@ -114,12 +138,8 @@ export function Message() {
                 key={index}
                 className={`message ${msg.type}`}
                 title={locked ? msg.encrypted : msg.text}
-                onMouseEnter={(e) => {
-                  if (!locked) e.currentTarget.textContent = msg.encrypted;
-                }}
-                onMouseLeave={(e) => {
-                  if (!locked) e.currentTarget.textContent = msg.text;
-                }}
+                onMouseEnter={(e) => { if (!locked) e.currentTarget.textContent = msg.encrypted; }}
+                onMouseLeave={(e) => { if (!locked) e.currentTarget.textContent = msg.text; }}
               >
                 {locked ? msg.encrypted : msg.text}
               </div>
@@ -137,9 +157,7 @@ export function Message() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSend()}
               />
-              <button className="btn btn-primary" onClick={handleSend}>
-                Send
-              </button>
+              <button className="btn btn-primary" onClick={handleSend}>Send</button>
             </div>
           )}
         </div>

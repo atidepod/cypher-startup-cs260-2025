@@ -150,14 +150,14 @@ html {
   cursor: pointer;
 }
 
-.message.sent {
+.message.outgoing {
   background-color: #0d6efd;
   /* Bootstrap primary */
   margin-left: auto;
   color: white;
 }
 
-.message.received {
+.message.incoming {
   background-color: #6c757d;
   /* Bootstrap secondary */
   margin-right: auto;

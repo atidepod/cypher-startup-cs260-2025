@@ -8,52 +8,81 @@ import { Login } from './login/login.jsx';
 import { About } from './about/about.jsx';
 import { Message } from './message/message.jsx';
 
-
 export default function App() {
+  const [sessionId, setSessionId] = useState(null);
+  const [username, setUsername] = useState("");
+  const [chat, setChat] = useState("default");
+  
+
+  // Check localStorage for saved session
+  useEffect(() => {
+    const storedSession = localStorage.getItem("sessionId");
+    const storedUsername = localStorage.getItem("username");
+    if (storedSession && storedUsername) {
+      setSessionId(storedSession);
+      setUsername(storedUsername);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("sessionId");
+    localStorage.removeItem("username");
+    setSessionId(null);
+    setUsername("");
+  };
+
+  // Only show login page if no session
+  if (!sessionId) {
+    return <Login setSessionId={setSessionId} setUsername={setUsername} />;
+  }
+
   return (
     <BrowserRouter>
       <header className="container-fluid">
-        <menu>
-          <nav className="navbar navbar-expand-lg navbar-dark">
-            <div className="container-fluid">
-              <a className="navbar-brand fw-bold" href="#">Cypher</a>
-              <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span className="navbar-toggler-icon"></span>
-              </button>
-              <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
-                <ul className="navbar-nav">
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to="/">Login</NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to="/message">Messages</NavLink>
-                  </li>
-                  <li className="nav-item">
-                    <NavLink className="nav-link" to="/about">About</NavLink>
-                  </li>
-
-                  <li className="nav-item"><a className="nav-link" href="https://github.com/atidepod/cypher-startup-cs260-2025">Github</a></li>
-                </ul>
-              </div>
+        <nav className="navbar navbar-expand-lg navbar-dark">
+          <div className="container-fluid">
+            <a className="navbar-brand fw-bold" href="#">Cypher</a>
+            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div className="collapse navbar-collapse justify-content-end" id="navbarNav">
+              <ul className="navbar-nav">
+                  
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/message">Messages</NavLink>
+                </li>
+                <li className="nav-item">
+                  <NavLink className="nav-link" to="/about">About</NavLink>
+                </li>
+                <li className="nav-item">
+                  <a className="nav-link" href="https://github.com/atidepod/cypher-startup-cs260-2025">Github</a>
+                </li>
+                <li className="nav-item">
+                  <button onClick={handleLogout} className="btn btn-danger btn-sm ms-2">
+                    Logout
+                  </button>
+                </li>
+             
+              </ul>
             </div>
-          </nav>
-        </menu>
-
-
+          </div>
+        </nav>
       </header>
+
       <Routes>
-        <Route path='/' element={<Login />} exact />
+        <Route path='/' element={<Login />} />
+        <Route path='/message' element={<Message sessionId={sessionId} username={username} onLogout={handleLogout} />} />
         <Route path='/about' element={<About />} />
-        <Route path='/message' element={<Message />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
+
       <footer className="footer">
         © 2025 Cypher
       </footer>
     </BrowserRouter>
-
   );
 }
+
 function NotFound() {
   return <main className="container-fluid bg-secondary text-center">404: LOL Return to sender. Address unknown.</main>;
 }

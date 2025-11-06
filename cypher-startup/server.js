@@ -1,87 +1,81 @@
-// server.js
 import express from "express";
-import cookieParser from "cookie-parser";
 import cors from "cors";
-import { v4 as uuidv4 } from "uuid";
+import bodyParser from "body-parser";
+import crypto from "crypto";
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
-// Middleware
-app.use(express.json());
-app.use(cookieParser());
 app.use(cors({
-  origin: "http://localhost:5173", // your React dev server
-  credentials: true,
+  origin: "http://localhost:5173", // allow your frontend
+  credentials: true // if you send cookies
 }));
+app.use(bodyParser.json());
 
-// In-memory storage (for demo only)
-let users = {}; // { username: { id, username } }
-let messages = {}; // { username: [{ from, to, text, time }] }
+// --- In-memory storage ---
+const users = {}; // { username: { password, chats: { chatName: [{encrypted, otp}] } } }
+const sessions = {}; // { sessionId: username }
 
-// 🧑 Register/Login (simplified for demo)
+// --- Helper to generate session IDs ---
+const generateSessionId = () => crypto.randomBytes(16).toString("hex");
+
+// --- Login endpoint ---
 app.post("/api/login", (req, res) => {
-  const { username } = req.body;
+  const { username, password } = req.body;
   if (!username) return res.status(400).json({ error: "Username required" });
 
-  let user = users[username];
-  if (!user) {
-    user = { id: uuidv4(), username };
-    users[username] = user;
+  if (!users[username]) {
+    users[username] = { password: password || "", chats: {} }; // create new user
   }
 
-  res.cookie("cypherUser", username, {
-    httpOnly: false, // so client JS can access for now
-    sameSite: "strict",
-  });
-  res.json({ success: true, username });
+  const sessionId = generateSessionId();
+  sessions[sessionId] = username;
+
+  res.json({ sessionId, username });
 });
 
-// 🧾 Logout
+// --- Logout endpoint ---
 app.post("/api/logout", (req, res) => {
-  const username = req.cookies.cypherUser;
-  if (username) delete users[username];
-  res.clearCookie("cypherUser");
+  const { sessionId } = req.body;
+  if (sessionId && sessions[sessionId]) {
+    delete sessions[sessionId];
+  }
   res.json({ success: true });
 });
 
-// 📩 Send Message
-app.post("/api/message", (req, res) => {
-  const { from, to, text } = req.body;
-  if (!from || !to || !text)
-    return res.status(400).json({ error: "Missing required fields" });
-
-  const message = { from, to, text, time: new Date().toISOString() };
-
-  if (!messages[from]) messages[from] = [];
-  if (!messages[to]) messages[to] = [];
-
-  messages[from].push(message);
-  messages[to].push(message);
-
-  res.json({ success: true, message });
-});
-
-// 💬 Get Messages for a User
-app.get("/api/messages/:username", (req, res) => {
-  const { username } = req.params;
-  res.json(messages[username] || []);
-});
-
-// 🧠 Get Active Users
-app.get("/api/users", (_req, res) => {
-  res.json(Object.keys(users));
-});
-
-// 🧩 3rd Party Example: Random Quote
-app.get("/api/quote", async (_req, res) => {
-  try {
-    const response = await fetch("https://api.quotable.io/random");
-    const data = await response.json();
-    res.json({ text: data.content, author: data.author });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch quote" });
+// --- Middleware to check session ---
+const requireAuth = (req, res, next) => {
+  const sessionId = req.headers["x-session-id"];
+  if (!sessionId || !sessions[sessionId]) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
+  req.username = sessions[sessionId];
+  next();
+};
+
+// --- Get messages for a chat ---
+app.get("/api/messages/:chat", requireAuth, (req, res) => {
+  const { chat } = req.params;
+  const username = req.username;
+
+  const userData = users[username];
+  const chatMessages = userData.chats[chat] || [];
+  res.json(chatMessages);
 });
 
-app.listen(PORT, () => console.log(`✅ Cypher backend running on port ${PORT}`));
+// --- Add a new message to a chat ---
+app.post("/api/messages/:chat", requireAuth, (req, res) => {
+  const { chat } = req.params;
+  const { encrypted, otp } = req.body;
+  const username = req.username;
+
+  if (!encrypted || !otp) return res.status(400).json({ error: "Missing data" });
+
+  const userData = users[username];
+  if (!userData.chats[chat]) userData.chats[chat] = [];
+  userData.chats[chat].push({ encrypted, otp });
+
+  res.json({ success: true });
+});
+
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
