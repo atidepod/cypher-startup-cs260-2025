@@ -80,9 +80,10 @@ export function Login({ setSessionId, setUsername }) {
           Login
         </button>
 
-        <div style={{ marginTop: "1rem", fontSize: "0.9rem", color: "lightgray" }}>
-          {loadingWord ? "Loading random word..." : `Random word of the moment: "${randomWord}"`}
+        <div className="random-word">
+          {loadingWord ? "Loading..." : `Random word: "${randomWord}"`}
         </div>
+
       </div>
     </div>
   );

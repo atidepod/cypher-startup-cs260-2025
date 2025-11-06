@@ -59,6 +59,12 @@ html {
   text-align: center;
 }
 
+.random-word {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  color: lightgray;
+}
+
 .login-card h2 {
   margin-bottom: 1.5rem;
   color:white;
