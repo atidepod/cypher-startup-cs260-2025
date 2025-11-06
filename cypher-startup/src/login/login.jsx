@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { Message } from "../message/message.jsx";
+import { About } from "../about/about.jsx";
 import "../app.css";
 
 export function Login({ setSessionId, setUsername }) {
   const [inputUsername, setInputUsername] = useState("");
   const [password, setPassword] = useState(""); // optional
-  const [randomWord, setRandomWord] = useState(""); // added
-  const [loadingWord, setLoadingWord] = useState(true); // added
+  const [randomWord, setRandomWord] = useState("");
+  const [loadingWord, setLoadingWord] = useState(true);
 
-  // Fetch random word from third-party API
   useEffect(() => {
     const fetchRandomWord = async () => {
       try {
@@ -24,7 +25,6 @@ export function Login({ setSessionId, setUsername }) {
     fetchRandomWord();
   }, []);
 
-  // Handle login
   const handleLogin = async () => {
     if (!inputUsername.trim()) {
       alert("Enter a username");
@@ -81,9 +81,8 @@ export function Login({ setSessionId, setUsername }) {
         </button>
 
         <div className="random-word">
-          {loadingWord ? "Loading..." : `Random word: "${randomWord}"`}
+          {loadingWord ? "Loading random word..." : `Random word of the moment: "${randomWord}"`}
         </div>
-
       </div>
     </div>
   );

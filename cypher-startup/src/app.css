@@ -106,6 +106,12 @@ html {
   border-radius: 0.5rem;
 }
 
+.sidebar p {
+  font-size: 0.8rem;
+  color: white;
+  margin-top: 10px;
+}
+
 .sidebar h5 {
   margin-bottom: 1rem;
 }

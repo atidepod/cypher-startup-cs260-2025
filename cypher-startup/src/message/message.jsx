@@ -101,7 +101,7 @@ const handleSend = async () => {
 
   return (
     <main className="container">
-      <div className="container-fluidq" style={{ display: "flex" }}>
+      <div className="container-fluidq">
         {/* Sidebar */}
         <div className="sidebar">
           <h5 className="text-white mb-3">Conversations</h5>
@@ -121,7 +121,7 @@ const handleSend = async () => {
           <button className="btn btn-secondary w-100 mt-2" onClick={onLogout}>
             Logout
           </button>
-          <p style={{ fontSize: "0.8rem", color: "white", marginTop: "10px" }}>
+          <p>
             Shortcut: <strong>Ctrl + e</strong> Password: royer
           </p>
         </div>

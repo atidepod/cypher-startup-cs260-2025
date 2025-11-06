@@ -2,110 +2,96 @@ import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
 import crypto from "crypto";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 const PORT = 3001;
 
-// --- Middleware setup ---
+// --- Helpers for __dirname in ES modules ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// --- Middleware ---
 app.use(cors({
-  origin: "http://localhost:5173", // your frontend dev server
-  methods: ["GET", "POST"],
-  allowedHeaders: ["Content-Type", "x-session-id"],
+  origin: "http://localhost:5173", // your frontend origin
   credentials: true
 }));
 app.use(bodyParser.json());
 
 // --- In-memory storage ---
-const users = {};     // { username: { password, chats: { chatName: [{ encrypted, otp }] } } }
-const sessions = {};  // { sessionId: username }
+const users = {};    // { username: { password, chats: { chatName: [{encrypted, otp}] } } }
+const sessions = {}; // { sessionId: username }
 
-// --- Helper: generate random session ID ---
+// --- Helper to generate session IDs ---
 const generateSessionId = () => crypto.randomBytes(16).toString("hex");
 
-// --- Middleware: check if user is logged in ---
-const requireAuth = (req, res, next) => {
-  const sessionId = req.headers["x-session-id"];
-
-  if (!sessionId) {
-    console.warn("⚠️ Missing session ID header");
-    return res.status(401).json({ error: "Missing session ID" });
-  }
-
-  const username = sessions[sessionId];
-  if (!username) {
-    console.warn("⚠️ Invalid session ID:", sessionId);
-    return res.status(401).json({ error: "Invalid or expired session" });
-  }
-
-  req.username = username;
-  next();
-};
-
-// --- LOGIN / REGISTER ---
+// --- Login endpoint ---
 app.post("/api/login", (req, res) => {
   const { username, password } = req.body;
+  if (!username) return res.status(400).json({ error: "Username required" });
 
-  if (!username || username.trim() === "") {
-    return res.status(400).json({ error: "Username required" });
-  }
-
-  // Create user if doesn't exist
   if (!users[username]) {
     users[username] = { password: password || "", chats: {} };
-    console.log(`🆕 Created new user: ${username}`);
   }
 
-  // Generate new session
   const sessionId = generateSessionId();
   sessions[sessionId] = username;
-
-  console.log(`✅ ${username} logged in with session ${sessionId}`);
 
   res.json({ sessionId, username });
 });
 
-// --- LOGOUT ---
+// --- Logout endpoint ---
 app.post("/api/logout", (req, res) => {
   const { sessionId } = req.body;
   if (sessionId && sessions[sessionId]) {
-    const username = sessions[sessionId];
     delete sessions[sessionId];
-    console.log(`👋 ${username} logged out`);
   }
   res.json({ success: true });
 });
 
-// --- GET MESSAGES ---
+// --- Middleware to check session ---
+const requireAuth = (req, res, next) => {
+  const sessionId = req.headers["x-session-id"];
+  if (!sessionId || !sessions[sessionId]) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+  req.username = sessions[sessionId];
+  next();
+};
+
+// --- Get messages for a chat ---
 app.get("/api/messages/:chat", requireAuth, (req, res) => {
   const { chat } = req.params;
   const username = req.username;
 
   const userData = users[username];
   const chatMessages = userData.chats[chat] || [];
-
-  console.log(`📨 Fetched ${chatMessages.length} messages for ${username} in chat '${chat}'`);
   res.json(chatMessages);
 });
 
-// --- POST MESSAGE ---
+// --- Add a new message to a chat ---
 app.post("/api/messages/:chat", requireAuth, (req, res) => {
   const { chat } = req.params;
   const { encrypted, otp } = req.body;
   const username = req.username;
 
-  if (!encrypted || !otp) {
-    console.warn("⚠️ Missing encrypted or otp in request body");
-    return res.status(400).json({ error: "Missing data" });
-  }
+  if (!encrypted || !otp) return res.status(400).json({ error: "Missing data" });
 
   const userData = users[username];
   if (!userData.chats[chat]) userData.chats[chat] = [];
-
   userData.chats[chat].push({ encrypted, otp });
 
-  console.log(`💬 Message stored for ${username} in chat '${chat}'`);
   res.json({ success: true });
 });
 
-// --- Server start ---
-app.listen(PORT, () => console.log(`🚀 Server running at http://localhost:${PORT}`));
+// --- Serve frontend via static middleware ---
+app.use(express.static(path.join(__dirname, "dist"))); // change "dist" if your build folder is different
+
+// --- Catch-all for React Router ---
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
+});
+
+// --- Start server ---
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
