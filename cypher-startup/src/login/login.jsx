@@ -84,7 +84,7 @@ export function Login({ setSessionId, setUsername }) {
           {loadingWord ? "Loading random word..." : `Random word of the moment: "${randomWord}"`}
         </div>
         <div>
-          <p>Please enter any username and password. The navigation bar including the github link will unlock afterwards</p>
+          <p>Please enter any username and password. The navigation bar will unlock afterwards</p>
         </div>
       </div>
     </div>
