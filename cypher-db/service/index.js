@@ -23,8 +23,7 @@ app.use(cors({
 
 app.use(bodyParser.json());
 
-// --- In-memory storage ---
-const users = {};
+// --- In-memory session storage ---
 const sessions = {};
 
 // --- Helper to generate session IDs ---
@@ -36,12 +35,14 @@ app.post("/api/login", async (req, res) => {
   if (!username) return res.status(400).json({ error: "Username required" });
 
   let user = await getUser(username);
+
   if (!user) {
+    // Create new user if doesn't exist
     await addUser({ username, password: password || "", chats: {} });
     user = await getUser(username);
+  } else if (password && user.password !== password) {
+    return res.status(401).json({ error: "Incorrect password" });
   }
-
-  users[username] = { password: user.password, chats: user.chats || {} };
 
   const sessionId = generateSessionId();
   sessions[sessionId] = username;
@@ -86,11 +87,6 @@ app.post("/api/messages/:chat", requireAuth, async (req, res) => {
   if (!encrypted || !otp) return res.status(400).json({ error: "Missing data" });
 
   await addMessage({ chat, encrypted, otp, username });
-
-  if (!users[username]) users[username] = { password: "", chats: {} };
-  if (!users[username].chats[chat]) users[username].chats[chat] = [];
-  users[username].chats[chat].push({ encrypted, otp });
-
   res.json({ success: true });
 });
 
