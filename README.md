@@ -72,3 +72,6 @@ This one really made the website start to feel like a working project rather tha
 ### DATABASE
 This section was super important for this website to work well. I made it so that outgoing and incoming messages are storred securely on the database. I installed a section of code that will allow user authentication and creation. I also added a part that will allow public and private keys to be storred securely. I deployed the simon-db website to the "simon" subdomain of cypherw.click. With the addition of websocket next week, this will finally be a fully operational website. 
 
+### WEBSOCKET
+This is the final edit of the website before it is fully live and running. After I finished this section, I set up an account and gave the link to a friend of mine. I think that the next step would be to enable image and video support. I wonder how those could be properly encrypted to maintain the standard of the rest of the website. To complete this deliverable, I deployed Simon Websocket to the Simon subdomain of cypherw.click. I enable websocket requests on the backend, and connected it on the front end. I also configured the vite.config.js file to allow debugging during websocket requests. With this, the webiste is functional. But I think there is a long way to go before it has an easy user interface. 
+
